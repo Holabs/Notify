@@ -1,0 +1,35 @@
+<?php
+
+use Tracy\Dumper;
+use Holabs\Notify\INotification;
+
+/**
+ * @var INotification[] $notifications
+ * @var int $count
+ */
+
+?>
+
+<style>
+	#tracy-debug .holabs-notify-label{font-weight: bold;}
+	#tracy-debug .holabs-notify-table{width: 100%;}
+	#tracy-debug .holabs-notify-table .col-params{min-width: 150px;}
+	#tracy-debug .holabs-notify-inner{margin-top: 20px;}
+</style>
+
+<h1>Notifications</h1>
+<span class="holabs-notify-label">Count:</span> <?=$count?><br>
+
+<div class="nette-inner holabs-notify-inner">
+	<table class="holabs-notify-table">
+		<tr><th>Time</th><th>Key</th><th class="col-params">Parameters</th><th>Weight</th></tr>
+		<?php foreach ( $notifications as $notification ): ?>
+			<tr>
+				<td><?=$notification->getPublishDateTime()->format('H:i:s')?></td>
+				<td><?=$notification->getKey()?></td>
+				<td><?=Dumper::toHtml($notification->getParams())?></td>
+				<td><?=$notification->getWeight()?></td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>

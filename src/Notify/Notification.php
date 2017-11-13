@@ -3,16 +3,20 @@
 
 namespace Holabs\Notify;
 
+use \DateTime;
 
 /**
  * @author       Tomáš Holan <mail@tomasholan.eu>
  * @package      holabs/notify
  * @copyright    Copyright © 2017, Tomáš Holan [www.tomasholan.eu]
  */
-class Notification {
+class Notification implements INotification {
 
 	/** @var string */
 	private $key;
+
+	/** @var DateTime */
+	private $time;
 
 	/** @var array|null */
 	private $params;
@@ -20,21 +24,17 @@ class Notification {
 	/** @var int */
 	private $weight;
 
-	/** @var array */
-	private $excludedWorkers = [];
-
 	/**
 	 * Notification constructor.
 	 * @param string     $key
 	 * @param array|null $params
 	 * @param int        $weight
-	 * @param array      $excludedWorkers
 	 */
-	public function __construct(string $key, array $params = NULL, int $weight = 10, array $excludedWorkers = []) {
+	public function __construct(string $key, array $params = NULL, int $weight = 10) {
+		$this->time = new DateTime();
 		$this->key = $key;
 		$this->params = $params;
 		$this->weight = $weight;
-		$this->excludedWorkers = $excludedWorkers;
 	}
 
 	/**
@@ -42,6 +42,13 @@ class Notification {
 	 */
 	public function getKey(): string {
 		return $this->key;
+	}
+
+	/**
+	 * @return DateTime
+	 */
+	public function getPublishDateTime(): DateTime {
+		return $this->time;
 	}
 
 	/**
@@ -56,13 +63,6 @@ class Notification {
 	 */
 	public function getWeight(): int {
 		return $this->weight;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getExcludedWorkers(): array {
-		return $this->excludedWorkers;
 	}
 
 

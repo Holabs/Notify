@@ -3,60 +3,51 @@
 
 namespace Holabs\Notify;
 
-use Nette\SmartObject;
+use Nette\Utils\Callback;
 
 
 /**
  * @author       Tomáš Holan <mail@tomasholan.eu>
  * @package      holabs/notify
  * @copyright    Copyright © 2017, Tomáš Holan [www.tomasholan.eu]
- *
- * @method onPublish(Notifier $sender, Notification $notification)
  */
-class Notifier {
+class Notifier implements INotifier {
 
-	use SmartObject;
-
-	/** @var \Closure[]|callable[]|array */
-	public $onPublish = [];
-
-	/** @var array */
-	private $excludedWorkers = [];
+	/** @var callable[]|array */
+	protected $workers = [];
 
 	/**
 	 * @param string     $key
 	 * @param array|null $params
 	 * @param int        $priority
-	 * @param array      $excludeWorkers
-	 * @return Notification
+	 * @return INotification
 	 */
-	public function publish(string $key, array $params = NULL, int $priority = 10, array $excludeWorkers = []): Notification {
+	public function publish(string $key, array $params = NULL, int $priority = 10): INotification {
 
-		$conf = isset($this->excludedWorkers[$key]) ? $this->excludedWorkers[$key] : [];
-		$tmp = array_unique(array_merge($conf, $excludeWorkers));
+		$n = new Notification($key, $params, $priority);
 
-		$n = new Notification($key, $params, $priority, $tmp);
-
-		$this->onPublish($this, $n);
+		$this->onPublish($n);
 
 		return $n;
 	}
 
 	/**
-	 * @param string   $name
-	 * @param string[] ...$keys
-	 * @return Notifier
+	 * @param callable $callback
+	 * @return INotifier|Notifier
 	 */
-	public function excludeWorker(string $name, string ... $keys): self {
-
-		array_walk($keys, function($value) use ($name) {
-
-			$tmp = $this->excludedWorkers[$value];
-			$tmp[] = $name;
-			$this->excludedWorkers[$value] = array_unique($tmp);
-
-		});
+	public function registerWorker(callable $callback): INotifier {
+		$this->workers[] = $callback;
 
 		return $this;
 	}
+
+	/**
+	 * @param INotification $notification
+	 */
+	protected function onPublish(INotification $notification) {
+		foreach ($this->workers as $worker) {
+			Callback::invoke($worker, $this, $notification);
+		}
+	}
+
 }
