@@ -5,7 +5,7 @@ namespace Holabs\Notify\Bridges\Nette;
 
 use Holabs\Notify\Bridges\Tracy\NotifyPanel;
 use Holabs\Notify\Notifier;
-use Nette\DI\Extensions\ExtensionsExtension;
+use Nette\DI\CompilerExtension;
 
 
 /**
@@ -13,7 +13,7 @@ use Nette\DI\Extensions\ExtensionsExtension;
  * @package      holabs/notify
  * @copyright    Copyright © 2017, Tomáš Holan [www.tomasholan.eu]
  */
-class NotifyExtension extends ExtensionsExtension {
+class NotifyExtension extends CompilerExtension {
 
 	public function loadConfiguration() {
 		$builder = $this->getContainerBuilder();
